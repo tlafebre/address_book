@@ -12,8 +12,8 @@ impl fmt::Display for Contact {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "===========================================\nName: {} {}\nAge: {}\nAddress: {}\nEmail: {}\n",
-            self.first_name, self.last_name, self.age, self.address, self.email
+            "===========================================\nName: {}, {}\nAge: {}\nAddress: {}\nEmail: {}\n",
+            self.last_name, self.first_name, self.age, self.address, self.email
         )
     }
 }
@@ -27,10 +27,10 @@ impl Contact {
         email: String,
     ) -> Contact {
         Contact {
-            first_name,
-            last_name,
+            first_name: capitalize(&first_name),
+            last_name: capitalize(&last_name),
             age,
-            address,
+            address: capitalize(&address),
             email,
         }
     }
@@ -43,5 +43,13 @@ impl fmt::Display for Contacts {
         self.0.iter().fold(Ok(()), |result, contact| {
             result.and_then(|_| writeln!(f, "{}", contact))
         })
+    }
+}
+
+fn capitalize(name: &str) -> String {
+    let mut chars = name.chars();
+    match chars.next() {
+        None => String::new(),
+        Some(f) => f.to_uppercase().collect::<String>() + chars.as_str(),
     }
 }

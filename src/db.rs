@@ -27,7 +27,6 @@ impl Database {
             params![],
         )
         .expect("failed to create table");
-        println!("{}", conn.is_autocommit());
         Ok(())
     }
     pub fn connect(&self) -> Result<Connection, Error> {
@@ -44,8 +43,10 @@ impl Database {
     }
     pub fn list_contacts(&self) -> Result<Vec<Contact>, Error> {
         let conn = self.connect().unwrap();
-        let mut results =
-            conn.prepare("SELECT first_name, last_name, age, address, email FROM contacts")?;
+        let mut results = conn.prepare(
+            "SELECT first_name, last_name, age, address, email FROM contacts 
+                          ORDER BY last_name ASC, first_name ASC",
+        )?;
         let rows = results.query_map(params![], |row| {
             Ok(Contact {
                 first_name: row.get(0)?,
