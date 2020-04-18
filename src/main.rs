@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use std::io;
 use std::io::*;
 
@@ -20,6 +18,7 @@ enum Commands {
     NoOp,
 }
 
+#[allow(unused_must_use)]
 fn add(db: &Database) {
     print!("first name: ");
     std::io::stdout().flush();
@@ -27,7 +26,7 @@ fn add(db: &Database) {
     print!("last name: ");
     std::io::stdout().flush();
     let last_name = get_user_input();
-    print!("age: ");
+    print!("date of birth (YYYY-MM-DD): ");
     std::io::stdout().flush();
     let age = get_user_input();
     print!("address: ");
@@ -36,8 +35,14 @@ fn add(db: &Database) {
     print!("email: ");
     std::io::stdout().flush();
     let email = get_user_input();
-    let contact = Contact::new(first_name, last_name, age, address, email);
-    db.insert(contact);
+    let contact = Contact::new(first_name.clone(), last_name.clone(), age, address, email);
+    match db.insert(contact) {
+        Ok(()) => println!(
+            "{} was added to address book!",
+            format!("{} {}", first_name, last_name)
+        ),
+        Err(e) => println!("failed to add to address book: {}", e),
+    }
 }
 
 fn list(db: &Database) {
@@ -69,6 +74,7 @@ fn get_user_input() -> String {
     input.trim().to_string()
 }
 
+#[allow(unused_must_use)]
 fn menu() {
     println!("Address Book: ");
     println!(" 1) Add new contact");
@@ -120,7 +126,6 @@ fn check_database() -> Result<Database> {
 fn main() {
     check_dirs();
     let db = check_database().unwrap();
-
     loop {
         menu();
         match parse_command().unwrap() {

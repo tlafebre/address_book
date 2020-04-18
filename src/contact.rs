@@ -1,19 +1,24 @@
+use chrono::{offset::TimeZone, Datelike, NaiveDate, Utc};
+
+use std::convert::TryInto;
 use std::fmt;
 
 pub struct Contact {
     pub first_name: String,
     pub last_name: String,
-    pub age: String,
+    pub date_of_birth: String,
     pub address: String,
     pub email: String,
 }
 
 impl fmt::Display for Contact {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let date = NaiveDate::parse_from_str(&self.date_of_birth, "%Y-%m-%d").unwrap();
+        let age = age(date.year(), date.month(), date.day());
         write!(
             f,
-            "===========================================\nName: {}, {}\nAge: {}\nAddress: {}\nEmail: {}\n",
-            self.last_name, self.first_name, self.age, self.address, self.email
+            "===========================================\nName: {}, {}\nDate of birth: {} ({})\nAddress: {}\nEmail: {}\n",
+            self.last_name, self.first_name, self.date_of_birth, age, self.address, self.email
         )
     }
 }
@@ -22,14 +27,14 @@ impl Contact {
     pub fn new(
         first_name: String,
         last_name: String,
-        age: String,
+        date_of_birth: String,
         address: String,
         email: String,
     ) -> Contact {
         Contact {
             first_name: capitalize(&first_name),
             last_name: capitalize(&last_name),
-            age,
+            date_of_birth,
             address: capitalize(&address),
             email,
         }
@@ -44,6 +49,14 @@ impl fmt::Display for Contacts {
             result.and_then(|_| writeln!(f, "{}", contact))
         })
     }
+}
+
+pub fn age(year: i32, month: u32, day: u32) -> u32 {
+    let date_of_birth = Utc.ymd(year, month, day);
+    let now = Utc::now().date();
+    (now.signed_duration_since(date_of_birth).num_days() / 365)
+        .try_into()
+        .unwrap()
 }
 
 fn capitalize(name: &str) -> String {

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 pub fn home_dir() -> PathBuf {
-    std::env::current_dir().unwrap().to_path_buf()
+    std::env::current_dir().unwrap()
 }
 
 pub fn data_dir() -> PathBuf {
